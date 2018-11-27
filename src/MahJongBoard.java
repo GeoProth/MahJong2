@@ -10,6 +10,7 @@ public class MahJongBoard extends JPanel{
    // private String name; //name of file for dragon image
     private ImageIcon           dragon;
     private PlayClip            clip = new PlayClip("audio/stone-scraping.wav", true);
+    private boolean             sound;
     private static Dimension    dim = new Dimension(1550, 865);
     private static Color        yellow = Color.yellow;
     private static final int    X_AXIS = 15, //for placement of tiles on array
@@ -65,10 +66,10 @@ public class MahJongBoard extends JPanel{
 
     private MahJong                 main;
     private Tile[][][]              map = new Tile[Z_AXIS][Y_AXIS][X_AXIS];
-    private ArrayList<Tile>         deck = new ArrayList<Tile>(144);
+    private ArrayList<Tile>         deck = new ArrayList<>(144);
     private Tile                    first; // first to contain selected tiles for matching
     private Tile                    second;
-    private ArrayList<Tile> removedTiles = new ArrayList<Tile>(144);// hold removed tiles for panel
+    private ArrayList<Tile>         removedTiles = new ArrayList<>(144);// hold removed tiles for panel
    // private ArrayList<Polygon> shadow;
 
 
@@ -86,6 +87,7 @@ public class MahJongBoard extends JPanel{
         placeTiles();
         first = new Tile(false);
         second = new Tile(false);
+        toggleSound(true);
         //shadeTiles();
         //repaint();
 
@@ -149,7 +151,6 @@ public class MahJongBoard extends JPanel{
 
                         }
                         t.setCoords(x,y,z);
-
                         setComponentZOrder(t, zOrder);
                         map[z][y][x].setZOrder(zOrder);
                         zOrder++;
@@ -170,21 +171,34 @@ public class MahJongBoard extends JPanel{
                                     }
                                     else {
                                         second = map[t.getZCoord()][t.getYCoord()][t.getXCoord()];
+                                        second.setSelected(true);
 
-                                        if (first.matches(second) && first != second) {
+                                        if (first.matches(second) && first != map[t.getZCoord()][t.getYCoord()][t.getXCoord()]) {
 
-                                            second.setSelected(true);
+                                            //t.setSelected(true);
+                                            map[t.getZCoord()][t.getYCoord()][t.getXCoord()].setSelected(true);
+
 
                                             removedTiles.add(first);
                                             removedTiles.add(second);
 
-                                            clip.play();
+                                            if(sound)
+                                                clip.play();
+
+
                                             map[t.getZCoord()][t.getYCoord()][t.getXCoord()] = new Tile(false);
                                             map[first.getZCoord()][first.getYCoord()][first.getXCoord()] = new Tile(false);
+                                            //first = new Tile(false);
+                                           // second = new Tile(false);
 
 
-                                            second.setVisible(false);
+                                            t.setVisible(false);
                                             first.setVisible(false);
+
+                                            first = new Tile(false);
+                                            second = new Tile(false);
+
+                                            //repaint();
 
                                         }//end if
                                         else if(!first.matches(second) && first != second){
@@ -197,6 +211,9 @@ public class MahJongBoard extends JPanel{
                                         }//end else if
 
                                     }// end else
+                                    //first.setSelected(false);
+                                   // repaint();
+                                    //first = new Tile(false);
 
                                 }// end if tile is open
                             }//end mouse pressed
@@ -256,6 +273,9 @@ public class MahJongBoard extends JPanel{
     {
         if (x == 0 || x == X_AXIS-1 || z == Z_AXIS-1) {
             return true;
+        }
+        if(z == 3 && map[Z_AXIS - 1][3][6].isTile()){
+            return false;
         }
 
         return !map[z+1][y][x].isTile() &&
@@ -327,6 +347,14 @@ public class MahJongBoard extends JPanel{
 
 
     }//end fillGame
+
+    public void toggleSound(boolean s){
+        sound = s;
+    }
+
+    public boolean getSound(){
+        return sound;
+    }
 
 
 

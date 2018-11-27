@@ -1,19 +1,22 @@
 import javax.swing.*;
+import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.event.*;
 
+
+
 public class MahJong extends JFrame {
 
-    MahJongBoard                game;
+    private MahJongBoard                game;
     private static Dimension    dim = new Dimension(1550, 900);
-    public boolean              sound;
+   // public boolean              sound;
     private int                 seed;
-    JMenuItem soundItem, undo, restart, redo;
+    private JMenuItem soundItem, undo, restart, redo;
 
 
     public MahJong(){
 
-        sound = true;
+        //sound = true;
         seed = (int)(System.currentTimeMillis() % 100000);
         setSize(dim);
         //setLayout(new BorderLayout());
@@ -62,13 +65,11 @@ public class MahJong extends JFrame {
             }
         });
         soundOption.add(soundItem);
+
 //----------------------------------------------------------------------------------
 
 
 //**********END MENU OPTION BAR*****************************************************
-
-
-
 
 
         setVisible(true);
@@ -78,8 +79,13 @@ public class MahJong extends JFrame {
 
     private void setSound(){
         // turn sound on/off
-        sound = !sound;
-        soundItem.setText(sound ? "Sound Off" : "Sound On");
+        if(game.getSound()){
+            game.toggleSound(false);
+        }
+        else{
+            game.toggleSound(true);
+        }
+        soundItem.setText(game.getSound() ? "Sound Off" : "Sound On");
 
     }
 
