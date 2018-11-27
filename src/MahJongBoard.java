@@ -74,7 +74,7 @@ public class MahJongBoard extends JPanel{
 
 
 
-    public MahJongBoard(MahJong game){
+    public MahJongBoard(MahJong game, int seed){
         this.main = game;
 
         //get background image
@@ -83,13 +83,13 @@ public class MahJongBoard extends JPanel{
         setLayout(null);
         setSize(dim);
         tileDeck();
-        fillGame();
+        fillGame(seed);
         placeTiles();
         first = new Tile(false);
         second = new Tile(false);
         toggleSound(true);
         //shadeTiles();
-        //repaint();
+
 
         
 
@@ -197,6 +197,11 @@ public class MahJongBoard extends JPanel{
 
                                             first = new Tile(false);
                                             second = new Tile(false);
+                                            //System.out.println(removedTiles);
+
+                                            if(removedTiles.size() == 144){
+                                                gameWon();
+                                            }
 
                                             //repaint();
 
@@ -211,15 +216,24 @@ public class MahJongBoard extends JPanel{
                                         }//end else if
 
                                     }// end else
-                                    //first.setSelected(false);
-                                   // repaint();
-                                    //first = new Tile(false);
+                                    /* TEST FOR GAME WON
+                                    removedTiles.add(first);
+                                    map[t.getZCoord()][t.getYCoord()][t.getXCoord()] = new Tile(false);
+                                    first = new Tile(false);
+                                    t.setVisible(false);
+                                    first.setVisible(false);
+
+                                    if(removedTiles.size() == 144){
+                                        gameWon();
+                                    }
+                                    */
 
                                 }// end if tile is open
                             }//end mouse pressed
                         });//end mouseListener
 
                         add(t);
+
                     }//end if isTile
 
                 }
@@ -229,7 +243,7 @@ public class MahJongBoard extends JPanel{
     }// end placeTiles
 
 
-
+/* ####### CANNOT GET THIS TO WORK #########################
     private void shadeTiles(){
         for(int z = 0; z < Z_AXIS; z++){
             for(int y = 0; y < Y_AXIS; y++){
@@ -268,6 +282,8 @@ public class MahJongBoard extends JPanel{
         return shadow;
     }//end getShadow
 
+    #######################################################
+*/
 
     public boolean isTileOpen(int x, int y, int z)
     {
@@ -326,8 +342,8 @@ public class MahJongBoard extends JPanel{
     }//end tileDeck
 
     //fill a game block with tiles randomly selected using gameMap
-    private void fillGame(){
-        Random rand = new Random();
+    private void fillGame(int seed){
+        Random rand = new Random(seed);
         //Collections.shuffle(deck, rand);
         for(int z = 0; z < Z_AXIS; z++){
             for(int y = 0; y < Y_AXIS; y++){
@@ -347,6 +363,33 @@ public class MahJongBoard extends JPanel{
 
 
     }//end fillGame
+    public boolean canUndo(){
+        return !removedTiles.isEmpty();
+    }
+
+    public void undoTiles(){
+        //removedTiles list
+        Tile undo1 = removedTiles.remove(removedTiles.size() - 1);
+        Tile undo2 = removedTiles.remove(removedTiles.size() - 1);
+
+
+        map[undo1.getZCoord()][undo1.getYCoord()][undo1.getXCoord()] = undo1;
+        map[undo2.getZCoord()][undo2.getYCoord()][undo2.getXCoord()] = undo2;
+
+        undo1.setVisible(true);
+        undo2.setVisible(true);
+        undo1.setSelected(false);
+        undo2.setSelected(false);
+    }
+
+    public void gameWon(){
+        Fireworks fire = new Fireworks(this);
+
+        fire.setExplosions(10, 1000);
+        fire.setSound(sound);
+        fire.fire();
+
+    }
 
     public void toggleSound(boolean s){
         sound = s;
