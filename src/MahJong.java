@@ -1,19 +1,22 @@
-import com.sun.codemodel.internal.JOp;
-import jdk.nashorn.internal.scripts.JO;
 
 import javax.swing.*;
 import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.Stack;
 
 
 
 public class MahJong extends JFrame {
 
-    private MahJongBoard                game;
-    private static Dimension    dim = new Dimension(1550, 900);
+    private MahJongBoard        game;
+    private static Dimension    dim = new  Dimension(1550, 900);
     private int                 seed;
-    private JMenuItem soundItem, undo, restart, load, redo;
+    private JMenuItem           soundItem, restart, load, undo, removed, redo;
+    private Stack<Tile>         undoStack = new Stack<>();
+    private JPanel[]            discard = new JPanel[2];
+    private Color               yellow = Color.YELLOW;
+    private int                 x, y;
 
 
     public MahJong(){
@@ -21,8 +24,6 @@ public class MahJong extends JFrame {
         //sound = true;
         seed = (int)(System.currentTimeMillis() % 1000000);
         setSize(dim);
-        //setLayout(new BorderLayout());
-       // setResizable(false);
         setLayout(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setTitle("MahJong GAME#: " + seed);
@@ -32,7 +33,9 @@ public class MahJong extends JFrame {
 
         //place in middle of screen
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation((screenSize.width - getWidth()) / 2, (screenSize.height - getHeight()) / 2);
+        setLocation((screenSize.width - getWidth()) / 2 + 100, (screenSize.height - getHeight()) / 2);
+        x = (screenSize.width - getWidth()) / 2 + 99;
+        y = (screenSize.height - getHeight()) / 2;
 
 //***********CREATE MENU OPTION BAR**************************************************
         JMenuBar menu = new JMenuBar();
@@ -108,7 +111,7 @@ public class MahJong extends JFrame {
         load.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String gameNum = JOptionPane.showInputDialog(null, "Enter Game Number to load: ");
+                String gameNum = JOptionPane.showInputDialog(null, "Enter 6 digit Game Number to load: ");
                 if(!gameNum.isEmpty() && gameNum.length() == 6 && isInteger(gameNum)){
                     loadGame(gameNum);
 
@@ -121,8 +124,48 @@ public class MahJong extends JFrame {
  //---------------------------------------------------------------------------------
 
  //------add Undo to Menu-----------------------------------------------------------
+       JMenu move = new JMenu("Move");
+       menu.add(move);
 
+       //UNDO
+       undo = new JMenuItem("Undo");
+       undo.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+               //removedTilePanel();
+               int yes = JOptionPane.showConfirmDialog(null, "Undo Previous play?", "Undo", JOptionPane.YES_NO_OPTION);
+               if(yes == 0){
+                   undoMove();
+               }
+           }
+       });
+       move.add(undo);
 
+       //Removed Tiles Scroll Bar
+        removed = new JMenuItem("Removed Tiles");
+        removed.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                removedTilePanel();
+            }
+        });
+        move.add(removed);
+//--------------------------------------------------------------------------------
+//--------add EXIT to Menu--------------------------------------------------------
+        JMenuItem exit = new JMenuItem("Exit");
+       // exit.setLayout();
+        exit.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int yes = JOptionPane.showConfirmDialog(null, "Exit MahJong?", "Exit", JOptionPane.YES_NO_OPTION);
+                if(yes == 0){
+                    System.exit(0);
+                }
+            }
+        });
+        menu.add(Box.createHorizontalGlue());
+        menu.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        menu.add(exit);
 
 //**********END MENU OPTION BAR*****************************************************
 
@@ -131,6 +174,71 @@ public class MahJong extends JFrame {
 
     }// end Mahjong constructor
 
+    private void removedTilePanel(){
+        undoStack = game.getRemovedTiles();
+        System.out.println(undoStack);
+
+       JScrollPane scroll = new JScrollPane();
+       scroll.setPreferredSize(new Dimension(130, 470));
+       scroll.setBorder(BorderFactory.createRaisedBevelBorder());
+
+       //discard[0] = new JPanel(new FlowLayout(FlowLayout.LEFT));
+       //discard[1] = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        discard[0] = new JPanel();
+        discard[1] = new JPanel();
+       discard[0].setPreferredSize(new Dimension(120, 120));
+       discard[1].setPreferredSize(new Dimension(120, 120));
+
+       scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+       JPanel panel = new JPanel(new BorderLayout());
+       scroll.setViewportView(panel);
+
+      // panel.add(discard[0], BorderLayout.NORTH);
+      // panel.add(discard[1], BorderLayout.SOUTH);
+        panel.add(discard[0], BorderLayout.WEST);
+        panel.add(discard[1], BorderLayout.EAST);
+
+        discard[0].setBackground(yellow);
+        discard[1].setBackground(yellow);
+        panel.setBackground(yellow);
+
+        //discard[0].add(undoStack.pop());
+        //discard[1].add(undoStack.pop());
+        while(!undoStack.isEmpty()) {
+            Tile t = undoStack.pop();
+            t.setVisible(true);
+            t.setSelected(false);
+            discard[0].add(t);
+            t = undoStack.pop();
+            t.setVisible(true);
+            t.setSelected(false);
+            discard[1].add(t);
+        }
+        //scroll.revalidate();
+        //scroll.repaint();
+
+        
+
+       JFrame frame = new JFrame();
+       frame.setTitle("Removed Tiles");
+       frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+       frame.add(scroll);
+       frame.setSize(260, 600);
+       frame.setLocation(x - 260, y);
+       frame.setVisible(true);
+
+       scroll.revalidate();
+       scroll.repaint();
+
+    }
+
+    private void undoMove(){
+        if(game.canUndo()){
+            game.undoTiles();
+        }
+        //undoStack = game.getRemovedTiles();
+    }
 
     private void setSound(){
         // turn sound on/off
@@ -170,6 +278,8 @@ public class MahJong extends JFrame {
         repaint();
 
     }
+
+
 
 
     public static void main(String[] args){

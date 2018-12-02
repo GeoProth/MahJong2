@@ -4,7 +4,7 @@ import java.awt.*;
 import javax.swing.*;
 public class PictureTile extends Tile {
     private String              name;
-    private ImageIcon    image;
+    private ImageIcon           image;
 
     public PictureTile(String name){
         this.name = name;

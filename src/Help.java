@@ -48,8 +48,8 @@ public class Help extends JPanel implements HyperlinkListener {
         this(file);
 
         frame = new JFrame();
-        URL	url = Help.class.getResource("images/Help24.gif");
-        frame.setIconImage(Toolkit.getDefaultToolkit().getImage(url));
+       // URL	url = Help.class.getResource("images/Help24.gif");
+       // frame.setIconImage(Toolkit.getDefaultToolkit().getImage(url));
 
         frame.addWindowListener(new WindowAdapter()
         {	public void windowClosing(WindowEvent event)

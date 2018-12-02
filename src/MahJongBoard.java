@@ -3,6 +3,7 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.*;
 import javax.swing.*;
+import java.util.Stack;
 
 
 public class MahJongBoard extends JPanel{
@@ -10,10 +11,10 @@ public class MahJongBoard extends JPanel{
    // private String name; //name of file for dragon image
     private ImageIcon           dragon;
     private PlayClip            clip = new PlayClip("audio/stone-scraping.wav", true);
-    private boolean             sound;
+    private boolean             sound;//global sound variable
     private static Dimension    dim = new Dimension(1550, 865);
     private static Color        yellow = Color.yellow;
-    private static final int    X_AXIS = 15, //for placement of tiles on array
+    private static final int    X_AXIS = 15, //for placement of tiles on 3D array
                                 Y_AXIS = 8,
                                 Z_AXIS = 5;
 
@@ -65,10 +66,10 @@ public class MahJongBoard extends JPanel{
                                     };
 
     private MahJong                 main;
-    private Tile[][][]              map = new Tile[Z_AXIS][Y_AXIS][X_AXIS];
+    private Tile[][][]              map = new Tile[Z_AXIS][Y_AXIS][X_AXIS];//game board to place tiles
     private ArrayList<Tile>         deck = new ArrayList<>(144);
     private Tile                    first; // first to contain selected tiles for matching
-    private Tile                    second;
+    private Tile                    second;// second to contain selected tiles for matching
     private ArrayList<Tile>         removedTiles = new ArrayList<>(144);// hold removed tiles for panel
    // private ArrayList<Polygon> shadow;
 
@@ -363,6 +364,14 @@ public class MahJongBoard extends JPanel{
 
 
     }//end fillGame
+
+    public Stack<Tile> getRemovedTiles(){
+        Stack<Tile> removeTileStack = new Stack<>();
+        for(Tile t : removedTiles){
+            removeTileStack.push(t);
+        }
+        return removeTileStack;
+    }
     public boolean canUndo(){
         return !removedTiles.isEmpty();
     }

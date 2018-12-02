@@ -3,7 +3,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 public class Tile extends JPanel{
-    private static Dimension            dim = new Dimension(120, 120);
+    private static Dimension        dim = new Dimension(120, 120);
     private static Polygon          left = new Polygon();
     private static Polygon          lm = new Polygon();
     private static Polygon          bottom = new Polygon();
@@ -134,7 +134,7 @@ public class Tile extends JPanel{
     public boolean getSelected(){
         return this.selected;
     }
-    public void setShadow(ArrayList shadow){
+    public void setShadow(ArrayList<Polygon> shadow){
        this.shadow = shadow;
 
     }
