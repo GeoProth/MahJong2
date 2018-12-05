@@ -14,6 +14,7 @@ public class MahJong extends JFrame {
     private int                 seed;
     private JMenuItem           soundItem, restart, load, undo, removed, redo;
     private Stack<Tile>         undoStack = new Stack<>();
+    private Stack<Tile>         showRemoved = new Stack<>();
     private JPanel[]            discard = new JPanel[2];
     private Color               yellow = Color.YELLOW;
     private int                 x, y;
@@ -62,7 +63,8 @@ public class MahJong extends JFrame {
         menu.add(soundOption);
 
         //add sound controls
-        soundItem = new JMenuItem("Sound Off");
+        soundItem = new JMenuItem("Sound Off", 'S');
+        soundItem.setAccelerator(KeyStroke.getKeyStroke("ctrl S"));
         soundItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -78,7 +80,8 @@ public class MahJong extends JFrame {
         menu.add(game);
 
     //NEW GAME
-        JMenuItem newGame = new JMenuItem("New Game");
+        JMenuItem newGame = new JMenuItem("New Game", 'N');
+        newGame.setAccelerator(KeyStroke.getKeyStroke("ctrl N"));
         newGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -92,7 +95,8 @@ public class MahJong extends JFrame {
         game.add(newGame);
 
     //RESTART GAME
-        restart = new JMenuItem("Restart Game");
+        restart = new JMenuItem("Restart Game", 'G');
+        restart.setAccelerator(KeyStroke.getKeyStroke("ctrl G"));
         restart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -107,7 +111,8 @@ public class MahJong extends JFrame {
         game.add(restart);
 
     //LOAD PREVIOUS GAME
-        load = new JMenuItem("Load Game");
+        load = new JMenuItem("Load Game", 'L');
+        load.setAccelerator(KeyStroke.getKeyStroke("ctrl L"));
         load.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -128,7 +133,8 @@ public class MahJong extends JFrame {
        menu.add(move);
 
        //UNDO
-       undo = new JMenuItem("Undo");
+       undo = new JMenuItem("Undo", 'U');
+       undo.setAccelerator(KeyStroke.getKeyStroke("ctrl U"));
        undo.addActionListener(new ActionListener() {
            @Override
            public void actionPerformed(ActionEvent e) {
@@ -142,7 +148,8 @@ public class MahJong extends JFrame {
        move.add(undo);
 
        //Removed Tiles Scroll Bar
-        removed = new JMenuItem("Removed Tiles");
+        removed = new JMenuItem("Removed Tiles", 'R');
+        removed.setAccelerator(KeyStroke.getKeyStroke("ctrl R"));
         removed.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -153,6 +160,7 @@ public class MahJong extends JFrame {
 //--------------------------------------------------------------------------------
 //--------add EXIT to Menu--------------------------------------------------------
         JMenuItem exit = new JMenuItem("Exit");
+        exit.setAccelerator(KeyStroke.getKeyStroke("ctrl E"));
        // exit.setLayout();
         exit.addActionListener(new ActionListener() {
             @Override
@@ -186,8 +194,8 @@ public class MahJong extends JFrame {
        //discard[1] = new JPanel(new FlowLayout(FlowLayout.LEFT));
         discard[0] = new JPanel();
         discard[1] = new JPanel();
-       discard[0].setPreferredSize(new Dimension(120, 120));
-       discard[1].setPreferredSize(new Dimension(120, 120));
+        discard[0].setPreferredSize(new Dimension(120, 120));
+        discard[1].setPreferredSize(new Dimension(120, 120));
 
        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
@@ -228,8 +236,8 @@ public class MahJong extends JFrame {
        frame.setLocation(x - 260, y);
        frame.setVisible(true);
 
-       scroll.revalidate();
-       scroll.repaint();
+       //scroll.revalidate();
+       //scroll.repaint();
 
     }
 
