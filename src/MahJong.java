@@ -161,7 +161,7 @@ public class MahJong extends JFrame {
 //--------------------------------------------------------------------------------
 //--------add EXIT to Menu--------------------------------------------------------
         JMenuItem exit = new JMenuItem("Exit");
-        exit.setAccelerator(KeyStroke.getKeyStroke("ctrl E"));
+        //exit.setAccelerator(KeyStroke.getKeyStroke("ctrl E"));
        // exit.setLayout();
         exit.addActionListener(new ActionListener() {
             @Override
