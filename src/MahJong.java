@@ -14,7 +14,7 @@ public class MahJong extends JFrame {
     private int                 seed;
     private JMenuItem           soundItem, restart, load, undo, removed, redo;
     private Stack<Tile>         undoStack = new Stack<>();
-    private Stack<Tile>         showRemoved = new Stack<>();
+    //private Stack<Tile>         showRemoved = new Stack<>();
     private JPanel[]            discard = new JPanel[2];
     private Color               yellow = Color.YELLOW;
     private int                 x, y;
@@ -142,6 +142,7 @@ public class MahJong extends JFrame {
                int yes = JOptionPane.showConfirmDialog(null, "Undo Previous play?", "Undo", JOptionPane.YES_NO_OPTION);
                if(yes == 0){
                    undoMove();
+
                }
            }
        });
@@ -187,7 +188,7 @@ public class MahJong extends JFrame {
         System.out.println(undoStack);
 
        JScrollPane scroll = new JScrollPane();
-       scroll.setPreferredSize(new Dimension(130, 470));
+       scroll.setPreferredSize(new Dimension(240, 2*470));
        scroll.setBorder(BorderFactory.createRaisedBevelBorder());
 
        //discard[0] = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -198,6 +199,7 @@ public class MahJong extends JFrame {
         discard[1].setPreferredSize(new Dimension(120, 120));
 
        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+       //scroll.getVerticalScrollBar().setUnitIncrement(10);
 
        JPanel panel = new JPanel(new BorderLayout());
        scroll.setViewportView(panel);
@@ -291,7 +293,6 @@ public class MahJong extends JFrame {
 
 
     public static void main(String[] args){
-
         new MahJong();
     }
 
