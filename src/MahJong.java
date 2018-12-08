@@ -17,11 +17,15 @@ public class MahJong extends JFrame {
     //private Stack<Tile>       showRemoved = new Stack<>();
     private JPanel[]            discard = new JPanel[2];
     private Color               yellow = Color.YELLOW;
+    private boolean             removedVisible = false;
+    private JFrame              removedFrame;
+    private JPanel              removedTiles = new JPanel(new BorderLayout());
     private int                 x, y;
 
 
     public MahJong(){
 
+        initRemovedTilePanel();
         //sound = true;
         seed = (int)(System.currentTimeMillis() % 1000000);
         setSize(dim);
@@ -31,6 +35,12 @@ public class MahJong extends JFrame {
 
         game = new MahJongBoard(this, seed);
         add(game);
+        game.addTurnTakenListener(new TurnTakenListener() {
+            @Override
+            public void turnTaken() {
+                removedTilePanel();
+            }
+        });
 
         //place in middle of screen
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -149,6 +159,8 @@ public class MahJong extends JFrame {
         removed.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                removedVisible = !removedVisible;
+                removedFrame.setVisible(removedVisible);
                 removedTilePanel();
             }
         });
@@ -182,12 +194,13 @@ public class MahJong extends JFrame {
     }// end Mahjong constructor
 
     private void removedTilePanel(){
+        removedTiles.removeAll();
         undoStack = game.getRemovedTiles();
         System.out.println(undoStack);
 
-       JScrollPane scroll = new JScrollPane();
-       scroll.setPreferredSize(new Dimension(240, 2*470));
-       scroll.setBorder(BorderFactory.createRaisedBevelBorder());
+       //JScrollPane scroll = new JScrollPane();
+       //scroll.setPreferredSize(new Dimension(240, 2*470));
+       //scroll.setBorder(BorderFactory.createRaisedBevelBorder());
 
        //discard[0] = new JPanel(new FlowLayout(FlowLayout.LEFT));
        //discard[1] = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -196,56 +209,110 @@ public class MahJong extends JFrame {
         discard[0].setPreferredSize(new Dimension(120, 120));
         discard[1].setPreferredSize(new Dimension(120, 120));
 
-       scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+       //scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
        //scroll.getVerticalScrollBar().setUnitIncrement(10);
 
-       JPanel panel = new JPanel(new BorderLayout());
-       scroll.setViewportView(panel);
+       //JPanel panel = new JPanel(new BorderLayout());
+       //scroll.setViewportView(panel);
 
       // panel.add(discard[0], BorderLayout.NORTH);
       // panel.add(discard[1], BorderLayout.SOUTH);
-        panel.add(discard[0], BorderLayout.WEST);
-        panel.add(discard[1], BorderLayout.EAST);
+        removedTiles.add(discard[0], BorderLayout.WEST);
+        removedTiles.add(discard[1], BorderLayout.EAST);
 
         discard[0].setBackground(yellow);
         discard[1].setBackground(yellow);
-        panel.setBackground(yellow);
+        removedTiles.setBackground(yellow);
+
+        if(undoStack.isEmpty()){
+            removedFrame.repaint();
+        }
 
         //discard[0].add(undoStack.pop());
         //discard[1].add(undoStack.pop());
-        while(!undoStack.isEmpty()) {
-            Tile t = undoStack.pop();
-            t.setVisible(true);
-            t.setSelected(false);
-            discard[0].add(t);
-            t = undoStack.pop();
-            t.setVisible(true);
-            t.setSelected(false);
-            discard[1].add(t);
+        try {
+            while (!undoStack.isEmpty()) {
+                Tile t = undoStack.pop();
+                Tile clone1 = (Tile)t.clone();
+                Tile clone2 = (Tile)t.clone();
+                t.setVisible(false);
+                t.setSelected(false);
+                discard[0].add(clone1);
+                t = undoStack.pop();
+                t.setVisible(false);
+                t.setSelected(false);
+                discard[1].add(clone2);
+                clone1.setSelected(false);
+                clone2.setSelected(false);
+                clone1.setVisible(true);
+                clone2.setVisible(true);
+            }
         }
+        catch(Exception e){
 
+        }
         System.out.println(game.getRemovedTiles());
         //scroll.revalidate();
         //scroll.repaint();
 
-       JFrame frame = new JFrame();
-       frame.setTitle("Removed Tiles");
+      /* JFrame frame = new JFrame();
+        frame.setTitle("Removed Tiles");
        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
        frame.add(scroll);
        frame.setSize(260, 600);
        frame.setLocation(x - 260, y);
        frame.setVisible(true);
-
+    */
 
 
        //scroll.revalidate();
        //scroll.repaint();
 
     }
+    private void initRemovedTilePanel(){
+        JScrollPane scroll = new JScrollPane();
+        scroll.setPreferredSize(new Dimension(240, 2*470));
+        scroll.setBorder(BorderFactory.createRaisedBevelBorder());
+
+        scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+        scroll.setViewportView(removedTiles);
+
+        removedFrame = new JFrame();
+        removedFrame.setTitle("Removed Tiles");
+        removedFrame.setSize(260, 900);
+        removedFrame.setLocation(this.x - 260, this.y);
+        removedFrame.setDefaultCloseOperation(HIDE_ON_CLOSE);
+        removedFrame.addComponentListener(new ComponentListener() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+
+            }
+
+            @Override
+            public void componentShown(ComponentEvent e) {
+                    removedVisible = true;
+            }
+
+            @Override
+            public void componentHidden(ComponentEvent e) {
+                    removedVisible = false;
+            }
+        });
+        removedFrame.add(scroll);
+
+    }
+
 
     private void undoMove(){
         if(game.canUndo()){
             game.undoTiles();
+            removedTilePanel();
         }
         //undoStack = game.getRemovedTiles();
     }

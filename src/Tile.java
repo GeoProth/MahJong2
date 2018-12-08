@@ -2,7 +2,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.ArrayList;
-public class Tile extends JPanel{
+public class Tile extends JPanel implements Cloneable{
     private static Dimension        dim = new Dimension(120, 120);
     private static Polygon          left = new Polygon();
     private static Polygon          lm = new Polygon();
@@ -57,9 +57,9 @@ public class Tile extends JPanel{
 
         }
 
-        public Tile(Tile t){
-
-            t = new Tile();
+        public Object clone() throws CloneNotSupportedException
+        {
+            return super.clone();
         }
 
         public Tile(boolean bool){

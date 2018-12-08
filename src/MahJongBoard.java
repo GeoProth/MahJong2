@@ -71,6 +71,7 @@ public class MahJongBoard extends JPanel{
     private Tile                    first; // first to contain selected tiles for matching
     private Tile                    second;// second to contain selected tiles for matching
     private ArrayList<Tile>         removedTiles = new ArrayList<>(144);// hold removed tiles for panel
+    private Set<TurnTakenListener>  turnTakenListenerSet = new HashSet<>();
     //private JPanel[]                discard = new JPanel[2];
     //private int x, y;
    // private ArrayList<Polygon> shadow;
@@ -195,6 +196,10 @@ public class MahJongBoard extends JPanel{
                                             first = new Tile(false);
                                             second = new Tile(false);
                                             //System.out.println(removedTiles);
+
+                                            for(TurnTakenListener ttl : turnTakenListenerSet){
+                                                ttl.turnTaken();
+                                            }
 
                                             if(removedTiles.size() == 144){
                                                 gameWon();
@@ -363,6 +368,10 @@ public class MahJongBoard extends JPanel{
         undo2.setVisible(true);
         undo1.setSelected(false);
         undo2.setSelected(false);
+    }
+
+    public void addTurnTakenListener(TurnTakenListener ttl){
+        turnTakenListenerSet.add(ttl);
     }
 
 
