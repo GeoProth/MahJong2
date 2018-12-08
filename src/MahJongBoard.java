@@ -71,6 +71,8 @@ public class MahJongBoard extends JPanel{
     private Tile                    first; // first to contain selected tiles for matching
     private Tile                    second;// second to contain selected tiles for matching
     private ArrayList<Tile>         removedTiles = new ArrayList<>(144);// hold removed tiles for panel
+    //private JPanel[]                discard = new JPanel[2];
+    //private int x, y;
    // private ArrayList<Polygon> shadow;
 
 
@@ -89,11 +91,6 @@ public class MahJongBoard extends JPanel{
         first = new Tile(false);
         second = new Tile(false);
         toggleSound(true);
-        //shadeTiles();
-
-
-        
-
 
         setVisible(true);
 
@@ -115,8 +112,6 @@ public class MahJongBoard extends JPanel{
         //shadeTiles(g2);
 
     }//end paintComponent
-
-
 
     //place tiles on board according to zOrder, build from top to bottom, left to right
     private void placeTiles(){
@@ -243,49 +238,6 @@ public class MahJongBoard extends JPanel{
 
     }// end placeTiles
 
-
-/* ####### CANNOT GET THIS TO WORK #########################
-    private void shadeTiles(){
-        for(int z = 0; z < Z_AXIS; z++){
-            for(int y = 0; y < Y_AXIS; y++){
-                for(int x = 0; x < X_AXIS; x++){
-                    if(map[z][y][x].isTile()){
-                       //int xCoord = map[z][y][x].t.getXCoord();
-                       // int yCoord = map[z][y][x].t.getYCoord();
-                       // int zCoord = map[z][y][x].t.getZCoord();
-                        map[z][y][x].setShadow(getShadow(map[z][y][x], x, y, z));
-                       // repaint();
-
-                    }
-                }
-            }
-        }
-        //repaint();
-    }// end shadeTiles
-
-
-    private ArrayList<Polygon> getShadow(Tile t, int x, int y, int z){
-       ArrayList<Polygon> shadow = new ArrayList<>();
-        int xCoord = t.getXCoord();
-        int yCoord = t.getYCoord();
-        //int zCoord = t.getZCoord();
-
-        //North facing shadows
-        if((z == 0 && y == 0) || (z==1 && y == 1) || (z == 2 && y==2) || (z == 3 && y == 3) || z == 4){
-            Polygon temp = new Polygon();
-            temp.addPoint(xCoord+30, yCoord-10);
-            temp.addPoint(xCoord+20, yCoord);
-            temp.addPoint(xCoord+120, yCoord);
-            temp.addPoint(xCoord+130, yCoord-10);
-            shadow.add(temp);
-        }
-
-        return shadow;
-    }//end getShadow
-
-    #######################################################
-*/
-
     public boolean isTileOpen(int x, int y, int z)
     {
         if (x == 0 || x == X_AXIS-1 || z == Z_AXIS-1) {
@@ -370,6 +322,7 @@ public class MahJongBoard extends JPanel{
         for(Tile t : removedTiles){
             removeTileStack.push(t);
         }
+        //System.out.println(removedTiles);
         return removeTileStack;
     }
     public boolean canUndo(){
@@ -390,6 +343,7 @@ public class MahJongBoard extends JPanel{
         undo1.setSelected(false);
         undo2.setSelected(false);
     }
+
 
     public void gameWon(){
         Fireworks fire = new Fireworks(this);

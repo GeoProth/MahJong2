@@ -12,9 +12,9 @@ public class MahJong extends JFrame {
     private MahJongBoard        game;
     private static Dimension    dim = new  Dimension(1550, 900);
     private int                 seed;
-    private JMenuItem           soundItem, restart, load, undo, removed, redo;
+    private JMenuItem           soundItem, restart, load, undo, removed, exit, redo;
     private Stack<Tile>         undoStack = new Stack<>();
-    //private Stack<Tile>         showRemoved = new Stack<>();
+    //private Stack<Tile>       showRemoved = new Stack<>();
     private JPanel[]            discard = new JPanel[2];
     private Color               yellow = Color.YELLOW;
     private int                 x, y;
@@ -85,9 +85,8 @@ public class MahJong extends JFrame {
         newGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int yes = JOptionPane.showConfirmDialog(null, "Quit this game and start a new one?",
-                        "Game", JOptionPane.YES_NO_OPTION);
-                if(yes == 0){
+                if(JOptionPane.showConfirmDialog(null, "Quit this game and start a new one?",
+                        "Game", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
                     newGame();
                 }
             }
@@ -100,9 +99,8 @@ public class MahJong extends JFrame {
         restart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int yes = JOptionPane.showConfirmDialog(null, "Restart this same Game from beginning?",
-                        "Game", JOptionPane.YES_NO_OPTION);
-                if(yes == 0){
+                if(JOptionPane.showConfirmDialog(null, "Restart this same Game from beginning?",
+                        "Game", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
                     String newSeed = Integer.toString(seed);
                     loadGame(newSeed);
                 }
@@ -138,11 +136,8 @@ public class MahJong extends JFrame {
        undo.addActionListener(new ActionListener() {
            @Override
            public void actionPerformed(ActionEvent e) {
-               //removedTilePanel();
-               int yes = JOptionPane.showConfirmDialog(null, "Undo Previous play?", "Undo", JOptionPane.YES_NO_OPTION);
-               if(yes == 0){
+               if(JOptionPane.showConfirmDialog(null, "Undo Previous play?", "Undo", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
                    undoMove();
-
                }
            }
        });
@@ -160,21 +155,24 @@ public class MahJong extends JFrame {
         move.add(removed);
 //--------------------------------------------------------------------------------
 //--------add EXIT to Menu--------------------------------------------------------
-        JMenuItem exit = new JMenuItem("Exit");
-        //exit.setAccelerator(KeyStroke.getKeyStroke("ctrl E"));
-       // exit.setLayout();
+        JMenu exitOption = new JMenu("Exit");
+        menu.add(Box.createHorizontalGlue());
+        menu.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+        menu.add(exitOption);
+
+        exit = new JMenuItem("Exit Game", 'E');
+        exit.setAccelerator(KeyStroke.getKeyStroke("ctrl E"));
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int yes = JOptionPane.showConfirmDialog(null, "Exit MahJong?", "Exit", JOptionPane.YES_NO_OPTION);
-                if(yes == 0){
+                if(JOptionPane.showConfirmDialog(null, "Exit MahJong?", "Exit", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
                     System.exit(0);
                 }
+
             }
         });
-        menu.add(Box.createHorizontalGlue());
-        menu.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        menu.add(exit);
+
+        exitOption.add(exit);
 
 //**********END MENU OPTION BAR*****************************************************
 
@@ -225,10 +223,10 @@ public class MahJong extends JFrame {
             t.setSelected(false);
             discard[1].add(t);
         }
+
+        System.out.println(game.getRemovedTiles());
         //scroll.revalidate();
         //scroll.repaint();
-
-        
 
        JFrame frame = new JFrame();
        frame.setTitle("Removed Tiles");
@@ -237,6 +235,8 @@ public class MahJong extends JFrame {
        frame.setSize(260, 600);
        frame.setLocation(x - 260, y);
        frame.setVisible(true);
+
+
 
        //scroll.revalidate();
        //scroll.repaint();
