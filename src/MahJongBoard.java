@@ -88,6 +88,7 @@ public class MahJongBoard extends JPanel{
         tileDeck();
         fillGame(seed);
         placeTiles();
+        //shadeTiles();
         first = new Tile(false);
         second = new Tile(false);
         toggleSound(true);
@@ -236,7 +237,27 @@ public class MahJongBoard extends JPanel{
             }
         }//end loops
 
-    }// end placeTiles
+    }// end placeTile// s
+/*
+    private ArrayList<Polygon> getShadow(Tile t, int x, int y, int z){
+        ArrayList<Polygon> shadow = new ArrayList<>();
+        int xCoord = t.getXCoord();
+        int yCoord = t.getYCoord();
+        //int zCoord = t.getZCoord();
+
+        //North facing shadows
+        if((z == 0 && y == 0) || (z==1 && y == 1) || (z == 2 && y==2) || (z == 3 && y == 3) || z == 4){
+            Polygon temp = new Polygon();
+            temp.addPoint(xCoord+30, yCoord-10);
+            temp.addPoint(xCoord+20, yCoord);
+            temp.addPoint(xCoord+120, yCoord);
+            temp.addPoint(xCoord+130, yCoord-10);
+            shadow.add(temp);
+        }
+
+        return shadow;
+    }//end getShadow
+*/
 
     public boolean isTileOpen(int x, int y, int z)
     {
