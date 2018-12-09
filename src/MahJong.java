@@ -1,6 +1,5 @@
 
 import javax.swing.*;
-import javax.swing.event.MenuListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Stack;
@@ -14,18 +13,16 @@ public class MahJong extends JFrame {
     private int                 seed;
     private JMenuItem           soundItem, restart, load, undo, removed, exit, redo;
     private Stack<Tile>         undoStack = new Stack<>();
-    //private Stack<Tile>       showRemoved = new Stack<>();
     private JPanel[]            discard = new JPanel[2];
-    private Color               yellow = Color.YELLOW;
+    private static Color        yellow = Color.YELLOW;
     private boolean             removedVisible = false;
     private JFrame              removedFrame;
     private JPanel              removedTiles = new JPanel(new BorderLayout());
+    private JScrollPane         scroll = new JScrollPane();
     private int                 x, y;
 
 
     public MahJong(){
-
-        initRemovedTilePanel();
         //sound = true;
         seed = (int)(System.currentTimeMillis() % 1000000);
         setSize(dim);
@@ -47,6 +44,9 @@ public class MahJong extends JFrame {
         setLocation((screenSize.width - getWidth()) / 2 + 100, (screenSize.height - getHeight()) / 2);
         x = (screenSize.width - getWidth()) / 2 + 99;
         y = (screenSize.height - getHeight()) / 2;
+
+        initRemovedTilePanel();
+
 
 //***********CREATE MENU OPTION BAR**************************************************
         JMenuBar menu = new JMenuBar();
@@ -153,6 +153,19 @@ public class MahJong extends JFrame {
        });
        move.add(undo);
 
+       //REDO
+       redo = new JMenuItem("Redo", 'R');
+       redo.setAccelerator(KeyStroke.getKeyStroke("ctrl R"));
+       redo.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+               if(JOptionPane.showConfirmDialog(null, "Redo previous play?", "Redo", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION){
+                   redoMove();
+               }
+           }
+       });
+       move.add(redo);
+
        //Removed Tiles Scroll Bar
         removed = new JMenuItem("Removed Tiles", 'R');
         removed.setAccelerator(KeyStroke.getKeyStroke("ctrl R"));
@@ -165,6 +178,8 @@ public class MahJong extends JFrame {
             }
         });
         move.add(removed);
+
+
 //--------------------------------------------------------------------------------
 //--------add EXIT to Menu--------------------------------------------------------
         JMenu exitOption = new JMenu("Exit");
@@ -196,27 +211,17 @@ public class MahJong extends JFrame {
     private void removedTilePanel(){
         removedTiles.removeAll();
         undoStack = game.getRemovedTiles();
-        System.out.println(undoStack);
+        //System.out.println(undoStack);
+        int size = game.getRemovedTiles().size();
 
-       //JScrollPane scroll = new JScrollPane();
-       //scroll.setPreferredSize(new Dimension(240, 2*470));
-       //scroll.setBorder(BorderFactory.createRaisedBevelBorder());
+        Rectangle r = new Rectangle(x-10, y+10, 10, size * 120 + 10);
+        scroll.getViewport().scrollRectToVisible(r);
 
-       //discard[0] = new JPanel(new FlowLayout(FlowLayout.LEFT));
-       //discard[1] = new JPanel(new FlowLayout(FlowLayout.LEFT));
         discard[0] = new JPanel();
         discard[1] = new JPanel();
         discard[0].setPreferredSize(new Dimension(120, 120));
         discard[1].setPreferredSize(new Dimension(120, 120));
 
-       //scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-       //scroll.getVerticalScrollBar().setUnitIncrement(10);
-
-       //JPanel panel = new JPanel(new BorderLayout());
-       //scroll.setViewportView(panel);
-
-      // panel.add(discard[0], BorderLayout.NORTH);
-      // panel.add(discard[1], BorderLayout.SOUTH);
         removedTiles.add(discard[0], BorderLayout.WEST);
         removedTiles.add(discard[1], BorderLayout.EAST);
 
@@ -228,8 +233,6 @@ public class MahJong extends JFrame {
             removedFrame.repaint();
         }
 
-        //discard[0].add(undoStack.pop());
-        //discard[1].add(undoStack.pop());
         try {
             while (!undoStack.isEmpty()) {
                 Tile t = undoStack.pop();
@@ -249,29 +252,15 @@ public class MahJong extends JFrame {
             }
         }
         catch(Exception e){
-
+            System.out.println("This should never be called");
         }
-        System.out.println(game.getRemovedTiles());
-        //scroll.revalidate();
-        //scroll.repaint();
+        //System.out.println(game.getRemovedTiles());
 
-      /* JFrame frame = new JFrame();
-        frame.setTitle("Removed Tiles");
-       frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-       frame.add(scroll);
-       frame.setSize(260, 600);
-       frame.setLocation(x - 260, y);
-       frame.setVisible(true);
-    */
-
-
-       //scroll.revalidate();
-       //scroll.repaint();
 
     }
     private void initRemovedTilePanel(){
-        JScrollPane scroll = new JScrollPane();
-        scroll.setPreferredSize(new Dimension(240, 2*470));
+
+        scroll.setPreferredSize(new Dimension(250, 0));
         scroll.setBorder(BorderFactory.createRaisedBevelBorder());
 
         scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -281,24 +270,22 @@ public class MahJong extends JFrame {
         removedFrame = new JFrame();
         removedFrame.setTitle("Removed Tiles");
         removedFrame.setSize(260, 900);
-        removedFrame.setLocation(this.x - 260, this.y);
+        removedFrame.setLocation( x-260, y);
         removedFrame.setDefaultCloseOperation(HIDE_ON_CLOSE);
         removedFrame.addComponentListener(new ComponentListener() {
             @Override
             public void componentResized(ComponentEvent e) {
 
             }
-
             @Override
             public void componentMoved(ComponentEvent e) {
 
             }
-
             @Override
             public void componentShown(ComponentEvent e) {
                     removedVisible = true;
-            }
 
+            }
             @Override
             public void componentHidden(ComponentEvent e) {
                     removedVisible = false;
@@ -314,7 +301,20 @@ public class MahJong extends JFrame {
             game.undoTiles();
             removedTilePanel();
         }
-        //undoStack = game.getRemovedTiles();
+        else{
+            JOptionPane.showMessageDialog(null, "There are no Tiles To Undo", "Message", JOptionPane.WARNING_MESSAGE);
+        }
+
+    }
+
+    private void redoMove(){
+        if(game.canRedo()){
+            game.redoTiles();
+            removedTilePanel();
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "There are no Tiles to Redo", "Message", JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     private void setSound(){
@@ -337,6 +337,7 @@ public class MahJong extends JFrame {
         setTitle("MahJong GAME#: " + seed);
         repaint();
     }
+
     private boolean isInteger(String str){
         try{
             Integer.parseInt(str);
@@ -346,6 +347,7 @@ public class MahJong extends JFrame {
             return false;
         }
     }
+
     private void loadGame(String gameNum){
         remove(game);
         seed = Integer.parseInt(gameNum);
@@ -355,9 +357,6 @@ public class MahJong extends JFrame {
         repaint();
 
     }
-
-
-
 
     public static void main(String[] args){
         new MahJong();

@@ -62,8 +62,10 @@ public class Help extends JPanel implements HyperlinkListener {
         controls.add(close);
       */
         frame.add(this);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
         frame.setSize(800,600);
+        frame.setLocation((screenSize.width - this.getWidth()) / 2 - 300, (screenSize.height - this.getHeight()) / 2 - 200);
         frame.setTitle(title);
     }
 

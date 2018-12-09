@@ -16,7 +16,6 @@ public class Tile extends JPanel implements Cloneable{
     private static GradientPaint    newColor = new GradientPaint(120, 0, Color.decode("#8B5A00"), 20, 100, Color.decode("#FFB90F"));
     private static Color            black = Color.BLACK;
     private boolean                 selected = false;
-    private ArrayList<Polygon>      shadow = new ArrayList<>();
     private boolean                 isTile;
 
     private int x, y, z, zOrder;
@@ -100,30 +99,6 @@ public class Tile extends JPanel implements Cloneable{
             g2.drawPolygon(bm);
             g2.drawRect(20, 0, 99, 99);
 
-
-            /*//
-
-            if(this.shadow != null) {
-                Composite cOld = g2.getComposite();
-
-                //shadows
-                g2.setColor(Color.BLACK);
-
-                Composite cNew = ((AlphaComposite) cOld).derive(.25F);
-
-                g2.setComposite(cNew);
-
-                for (Polygon p : shadow) {
-                    g2.setClip(p);
-                    g2.fillPolygon(p);
-                }
-
-
-                g2.setComposite(cOld);
-                //repaint();
-            }
-        */
-
         }
 
 
@@ -134,11 +109,6 @@ public class Tile extends JPanel implements Cloneable{
     public boolean getSelected(){
         return this.selected;
     }
-    public void setShadow(ArrayList<Polygon> shadow){
-       this.shadow = shadow;
-
-    }
-
 
     public void setZOrder(int zOrder){
         this.zOrder = zOrder;

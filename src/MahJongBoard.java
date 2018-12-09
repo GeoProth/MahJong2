@@ -16,7 +16,8 @@ public class MahJongBoard extends JPanel{
     private static Color        yellow = Color.yellow;
     private static final int    X_AXIS = 15, //for placement of tiles on 3D array
                                 Y_AXIS = 8,
-                                Z_AXIS = 5;
+                                Z_AXIS = 5,
+                                MAX = 144;
 
     // 3D array for mapping game tiles
     private int[][][] gameArray = {   { {0,1,1,1,1,1,1,1,1,1,1,1,1,0,0},	// [z0, x, y]
@@ -67,15 +68,12 @@ public class MahJongBoard extends JPanel{
 
     private MahJong                 main;
     private Tile[][][]              map = new Tile[Z_AXIS][Y_AXIS][X_AXIS];//game board to place tiles
-    private ArrayList<Tile>         deck = new ArrayList<>(144);
+    private ArrayList<Tile>         deck = new ArrayList<>(MAX);
     private Tile                    first; // first to contain selected tiles for matching
     private Tile                    second;// second to contain selected tiles for matching
-    private ArrayList<Tile>         removedTiles = new ArrayList<>(144);// hold removed tiles for panel
+    private ArrayList<Tile>         removedTiles = new ArrayList<>(MAX);// hold removed tiles for panel
+    private ArrayList<Tile>         redoTiles = new ArrayList<>(MAX);
     private Set<TurnTakenListener>  turnTakenListenerSet = new HashSet<>();
-    //private JPanel[]                discard = new JPanel[2];
-    //private int x, y;
-   // private ArrayList<Polygon> shadow;
-
 
 
     public MahJongBoard(MahJong game, int seed){
@@ -89,7 +87,7 @@ public class MahJongBoard extends JPanel{
         tileDeck();
         fillGame(seed);
         placeTiles();
-        //shadeTiles();
+
         first = new Tile(false);
         second = new Tile(false);
         toggleSound(true);
@@ -111,7 +109,6 @@ public class MahJongBoard extends JPanel{
 
         g2.setColor(Color.BLACK);
 
-        //shadeTiles(g2);
 
     }//end paintComponent
 
@@ -186,9 +183,6 @@ public class MahJongBoard extends JPanel{
 
                                             map[t.getZCoord()][t.getYCoord()][t.getXCoord()] = new Tile(false);
                                             map[first.getZCoord()][first.getYCoord()][first.getXCoord()] = new Tile(false);
-                                            //first = new Tile(false);
-                                           // second = new Tile(false);
-
 
                                             t.setVisible(false);
                                             first.setVisible(false);
@@ -201,7 +195,7 @@ public class MahJongBoard extends JPanel{
                                                 ttl.turnTaken();
                                             }
 
-                                            if(removedTiles.size() == 144){
+                                            if(removedTiles.size() == MAX){
                                                 gameWon();
                                             }
 
@@ -218,17 +212,6 @@ public class MahJongBoard extends JPanel{
                                         }//end else if
 
                                     }// end else
-                                    /* TEST FOR GAME WON
-                                    removedTiles.add(first);
-                                    map[t.getZCoord()][t.getYCoord()][t.getXCoord()] = new Tile(false);
-                                    first = new Tile(false);
-                                    t.setVisible(false);
-                                    first.setVisible(false);
-
-                                    if(removedTiles.size() == 144){
-                                        gameWon();
-                                    }
-                                    */
 
                                 }// end if tile is open
                             }//end mouse pressed
@@ -243,26 +226,6 @@ public class MahJongBoard extends JPanel{
         }//end loops
 
     }// end placeTile// s
-/*
-    private ArrayList<Polygon> getShadow(Tile t, int x, int y, int z){
-        ArrayList<Polygon> shadow = new ArrayList<>();
-        int xCoord = t.getXCoord();
-        int yCoord = t.getYCoord();
-        //int zCoord = t.getZCoord();
-
-        //North facing shadows
-        if((z == 0 && y == 0) || (z==1 && y == 1) || (z == 2 && y==2) || (z == 3 && y == 3) || z == 4){
-            Polygon temp = new Polygon();
-            temp.addPoint(xCoord+30, yCoord-10);
-            temp.addPoint(xCoord+20, yCoord);
-            temp.addPoint(xCoord+120, yCoord);
-            temp.addPoint(xCoord+130, yCoord-10);
-            shadow.add(temp);
-        }
-
-        return shadow;
-    }//end getShadow
-*/
 
     public boolean isTileOpen(int x, int y, int z)
     {
@@ -360,14 +323,33 @@ public class MahJongBoard extends JPanel{
         Tile undo1 = removedTiles.remove(removedTiles.size() - 1);
         Tile undo2 = removedTiles.remove(removedTiles.size() - 1);
 
+        redoTiles.add(undo1);
+        redoTiles.add(undo2);
 
-        map[undo1.getZCoord()][undo1.getYCoord()][undo1.getXCoord()] = undo1;
-        map[undo2.getZCoord()][undo2.getYCoord()][undo2.getXCoord()] = undo2;
 
-        undo1.setVisible(true);
-        undo2.setVisible(true);
-        undo1.setSelected(false);
-        undo2.setSelected(false);
+        map[undo1.getZCoord()][undo1.getYCoord()][undo1.getXCoord()].setVisible(true);
+        map[undo2.getZCoord()][undo2.getYCoord()][undo2.getXCoord()].setVisible(true);
+        map[undo1.getZCoord()][undo1.getYCoord()][undo1.getXCoord()].setSelected(false);
+        map[undo2.getZCoord()][undo2.getYCoord()][undo2.getXCoord()].setSelected(false);
+
+
+    }
+
+    public boolean canRedo(){
+        return !redoTiles.isEmpty();
+    }
+
+    public void redoTiles(){
+        Tile redo1 = redoTiles.remove(redoTiles.size() - 1);
+        Tile redo2 = redoTiles.remove(redoTiles.size() -1 );
+
+        removedTiles.add(redo1);
+        removedTiles.add(redo2);
+
+        map[redo1.getZCoord()][redo1.getYCoord()][redo1.getXCoord()].setVisible(false);
+        map[redo2.getZCoord()][redo2.getYCoord()][redo2.getXCoord()].setVisible(false);
+        map[redo1.getZCoord()][redo1.getYCoord()][redo1.getXCoord()].setSelected(false);
+        map[redo2.getZCoord()][redo2.getYCoord()][redo2.getXCoord()].setSelected(false);
     }
 
     public void addTurnTakenListener(TurnTakenListener ttl){
